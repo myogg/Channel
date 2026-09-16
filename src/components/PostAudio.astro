@@ -1,35 +1,18 @@
 ---
-import { estimateSpeechSeconds, formatSpeechTime } from '../lib/tts'
+import { POST_AUDIO_LABELS as labels } from '../lib/post-audio'
+import { formatSpeechTime } from '../lib/tts'
 import type { TtsConfig } from '../lib/tts'
 
-const { chunks, permalink, config } = Astro.props as {
-  chunks: string[]
+const { permalink, config } = Astro.props as {
   permalink: string
   config: TtsConfig
 }
 
-const labels = {
-  idle: '聆听文章',
-  loading: '加载中',
-  pause: '暂停朗读',
-  resume: '继续播放',
-  share: '分享',
-  copied: '已复制链接',
-  copyFailed: '复制失败',
-  failed: '语音合成失败，请稍后重试',
-  synthesizing: '正在合成第 {index}/{total} 段',
-}
-
-const estimated = estimateSpeechSeconds(chunks)
-// The player reads its whole state from this attribute; Astro escapes it for us.
 const payload = JSON.stringify({
   api: config.api,
   token: config.token,
   voice: config.voice,
   permalink,
-  chunks,
-  labels,
-  estimated,
 })
 ---
 
@@ -64,7 +47,7 @@ const payload = JSON.stringify({
     </button>
     <span class="post-audio-label">{labels.idle}</span>
     <span class="post-audio-divider" aria-hidden="true"></span>
-    <span class="post-audio-time">{formatSpeechTime(estimated)}</span>
+    <span class="post-audio-time">{formatSpeechTime(0)}</span>
     <button class="post-audio-share" type="button" aria-label="分享本文">
       <svg
         class="post-audio-share-icon"

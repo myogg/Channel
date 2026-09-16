@@ -1,53 +1,80 @@
-interface PostAudioLabels {
-  idle: string
-  loading: string
-  pause: string
-  resume: string
-  share: string
-  copied: string
-  copyFailed: string
-  failed: string
-  synthesizing: string
+import { BLOCK_SELECTOR, estimateSpeechSeconds, formatSpeechTime, splitSpeechText, UNREADABLE_SELECTOR } from './tts'
+
+/** Shared with the server-rendered markup so both render the same words. */
+export const POST_AUDIO_LABELS = {
+  idle: '聆听文章',
+  loading: '加载中',
+  pause: '暂停朗读',
+  resume: '继续播放',
+  share: '分享',
+  copied: '已复制链接',
+  copyFailed: '复制失败',
+  failed: '语音合成失败，请稍后重试',
+  synthesizing: '正在合成第 {index}/{total} 段',
 }
 
-interface PostAudioPayload {
+interface PostAudioConfig {
   api: string
   token: string
   voice: string
   permalink: string
-  chunks: string[]
-  labels: PostAudioLabels
-  estimated: number
 }
 
-function formatTime(seconds: number): string {
-  const total = Math.max(0, Math.floor(seconds || 0))
-
-  return `${Math.floor(total / 60)}:${String(total % 60).padStart(2, '0')}`
-}
+/** Only one post reads at a time, so starting one stops whatever was playing. */
+let stopActive: (() => void) | null = null
 
 /**
- * Progressive enhancement for the read-aloud bar: the server renders the label,
- * the estimated duration, and the share control, and this module adds playback.
+ * Reads the rendered post body instead of shipping a second copy of the text
+ * in the page, which matters on a feed that repeats the whole channel.
  */
+function readableText(root: Element): string {
+  const clone = root.cloneNode(true) as Element
+
+  for (const node of clone.querySelectorAll(UNREADABLE_SELECTOR))
+    node.remove()
+
+  for (const br of clone.querySelectorAll('br'))
+    br.replaceWith('\n')
+
+  for (const block of clone.querySelectorAll(BLOCK_SELECTOR))
+    block.append('\n')
+
+  return (clone.textContent || '')
+    .replace(/[^\S\n]+/g, ' ')
+    .replace(/ *\n */g, '\n')
+    .replace(/\n{2,}/g, '\n')
+    .trim()
+}
+
 export function initPostAudio(): void {
-  const player = document.querySelector<HTMLElement>('.post-audio')
-  const payload = player?.dataset.postAudio
+  for (const player of document.querySelectorAll<HTMLElement>('.post-audio'))
+    initPlayer(player)
+}
 
-  if (!player || !payload)
-    return
-
-  const { api, token, voice, permalink, chunks, labels, estimated } = JSON.parse(payload) as PostAudioPayload
-
+function initPlayer(player: HTMLElement): void {
+  const payload = player.dataset.postAudio
+  const content = player.closest('.post-entry')?.querySelector<HTMLElement>('.post-content')
   const toggleBtn = player.querySelector<HTMLButtonElement>('.post-audio-toggle')
   const timeEl = player.querySelector<HTMLElement>('.post-audio-time')
   const shareBtn = player.querySelector<HTMLButtonElement>('.post-audio-share')
   const shareLabel = player.querySelector<HTMLElement>('.post-audio-share-label')
   const statusEl = player.querySelector<HTMLElement>('.post-audio-status')
 
-  if (!toggleBtn || !timeEl || !shareBtn || !chunks.length)
+  if (!payload || !content || !toggleBtn || !timeEl || !shareBtn) {
+    player.hidden = true
     return
+  }
 
+  const labels = POST_AUDIO_LABELS
+  const chunks = splitSpeechText(readableText(content))
+
+  if (!chunks.length) {
+    player.hidden = true
+    return
+  }
+
+  const { api, token, voice, permalink } = JSON.parse(payload) as PostAudioConfig
+  const estimated = estimateSpeechSeconds(chunks)
   const blobs = new Map<number, Blob>()
   const durations: number[] = []
   let index = 0
@@ -79,7 +106,7 @@ export function initPostAudio(): void {
   }
 
   const renderTime = (): void => {
-    timeEl.textContent = audio ? formatTime(offsetOf(index) + audio.currentTime) : formatTime(estimated)
+    timeEl.textContent = audio ? formatSpeechTime(offsetOf(index) + audio.currentTime) : formatSpeechTime(estimated)
   }
 
   const updateUI = (): void => {
@@ -110,6 +137,13 @@ export function initPostAudio(): void {
     updateUI()
   }
 
+  const stop = (): void => {
+    abortController?.abort()
+    detachAudio()
+    playing = false
+    updateUI()
+  }
+
   const getBlob = async (i: number): Promise<Blob> => {
     const cached = blobs.get(i)
     if (cached)
@@ -131,12 +165,6 @@ export function initPostAudio(): void {
       return
 
     getBlob(i).catch(() => {})
-  }
-
-  const stop = (): void => {
-    abortController?.abort()
-    detachAudio()
-    playing = false
   }
 
   const playFrom = async (i: number): Promise<void> => {
@@ -197,11 +225,19 @@ export function initPostAudio(): void {
     prefetch(index + 1)
   }
 
+  const claimPlayback = (): void => {
+    if (stopActive && stopActive !== stop)
+      stopActive()
+
+    stopActive = stop
+  }
+
   const handleToggle = (): void => {
     if (loading)
       return
 
     if (!started) {
+      claimPlayback()
       abortController = new AbortController()
       durations.length = 0
       blobs.clear()
@@ -217,6 +253,7 @@ export function initPostAudio(): void {
       playing = false
     }
     else {
+      claimPlayback()
       audio.play()
       playing = true
     }
@@ -259,5 +296,6 @@ export function initPostAudio(): void {
   toggleBtn.addEventListener('click', handleToggle)
   shareBtn.addEventListener('click', handleShare)
   window.addEventListener('beforeunload', stop)
+  renderTime()
   updateUI()
 }

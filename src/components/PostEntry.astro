@@ -3,7 +3,7 @@ import PostAudio from './PostAudio.astro'
 import { getBooleanEnv, getEnv } from '../lib/env'
 import { sanitizeContentHtml } from '../lib/sanitize'
 import { formatPostTime, getReactionLabel, getTagHref, paidReactionClass } from '../lib/post-ui'
-import { getSpeechText, getTtsConfig, splitSpeechText } from '../lib/tts'
+import { getTtsConfig } from '../lib/tts'
 import type { Post } from '../types'
 
 const locale = getEnv(import.meta.env, 'LOCALE')
@@ -29,9 +29,9 @@ const hasStoryTitle = post.title.trim().length > 0
 const hasReactions = Boolean(reactionsEnabled && post.reactions?.length > 0)
 const hasTags = post.tags.length > 0
 
-// Read-aloud is a detail-page affordance; the feed would synthesize every entry.
-const ttsConfig = isDetail ? getTtsConfig(import.meta.env) : null
-const speechChunks = ttsConfig ? splitSpeechText(getSpeechText(contentHtml)) : []
+const ttsConfig = getTtsConfig(import.meta.env)
+// The browser reads the rendered body, so this only skips posts with no text.
+const hasSpeechText = contentHtml.replace(/<[^>]*>/g, '').trim().length > 0
 ---
 
 <article class="post-entry" style={{ 'view-transition-name': `post-${post.id}` }}>
@@ -54,7 +54,7 @@ const speechChunks = ttsConfig ? splitSpeechText(getSpeechText(contentHtml)) : [
       </a>
     </p>
   </div>
-  {ttsConfig && speechChunks.length > 0 && <PostAudio chunks={speechChunks} permalink={permalink} config={ttsConfig} />}
+  {ttsConfig && hasSpeechText && <PostAudio permalink={permalink} config={ttsConfig} />}
   {hasContent && <div class="post-content content" set:html={contentHtml} />}
   <p class="tg-message-meta">
     <a href={permalink} title={post.datetime}>

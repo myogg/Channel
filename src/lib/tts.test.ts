@@ -1,14 +1,15 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import {
+  BLOCK_SELECTOR,
   DEFAULT_TTS_API,
   DEFAULT_TTS_TOKEN,
   DEFAULT_TTS_VOICE,
   estimateSpeechSeconds,
   formatSpeechTime,
-  getSpeechText,
   getTtsConfig,
   splitSpeechText,
   TTS_CHUNK_LENGTH,
+  UNREADABLE_SELECTOR,
 } from './tts'
 
 describe('getTtsConfig', () => {
@@ -54,43 +55,30 @@ describe('getTtsConfig', () => {
   })
 })
 
-describe('getSpeechText', () => {
-  it('keeps sentence text and drops block code', () => {
-    const html = '<p>第一段。</p><pre class="code"><code>const a = 1</code></pre><p>第二段。</p>'
-
-    expect(getSpeechText(html)).toBe('第一段。\n第二段。')
+describe('speech text selectors', () => {
+  // Extraction now runs in the browser, so these guard the rules it relies on.
+  it.each([
+    'pre',
+    'img',
+    'video',
+    'audio',
+    'iframe',
+    'button',
+    'label',
+    '.tgme_widget_message_link_preview',
+    '.tgme_widget_message_forwarded_from',
+  ])('skips %s when reading aloud', (selector) => {
+    expect(UNREADABLE_SELECTOR.split(', ')).toContain(selector)
   })
 
-  it('keeps inline code inside its sentence', () => {
-    expect(getSpeechText('<p>运行 <code>pnpm dev</code> 即可。</p>')).toBe('运行 pnpm dev 即可。')
+  it('keeps inline code readable by not skipping code elements', () => {
+    expect(UNREADABLE_SELECTOR.split(', ')).not.toContain('code')
   })
 
-  it('drops media, embed players, and interactive controls', () => {
-    const html
-      = '<p>正文。</p><img src="a.png" alt="图"><video src="b.mp4" controls></video>'
-        + '<button popovertarget="x">展开</button><p>结尾。</p>'
-
-    expect(getSpeechText(html)).toBe('正文。\n结尾。')
-  })
-
-  it('drops link preview cards and forwarded-source headers', () => {
-    const html
-      = '<div class="tgme_widget_message_link_preview"><span class="link_preview_title">标题</span></div>'
-        + '<div class="tgme_widget_message_forwarded_from">转自 某人</div><p>正文。</p>'
-
-    expect(getSpeechText(html)).toBe('正文。')
-  })
-
-  it('separates blocks and collapses whitespace', () => {
-    expect(getSpeechText('<p>上</p><p>下</p>')).toBe('上\n下')
-    expect(getSpeechText('<p>行一<br>行二</p>')).toBe('行一\n行二')
-    expect(getSpeechText('<p>  多个   空格  </p>')).toBe('多个 空格')
-  })
-
-  it('decodes entities and treats empty content as nothing to read', () => {
-    expect(getSpeechText('<p>a &amp; b &lt;c&gt;</p>')).toBe('a & b <c>')
-    expect(getSpeechText('')).toBe('')
-    expect(getSpeechText('<p>   </p>')).toBe('')
+  it('separates block boundaries so sentences do not run together', () => {
+    for (const selector of ['p', 'div', 'li', 'h1']) {
+      expect(BLOCK_SELECTOR.split(', ')).toContain(selector)
+    }
   })
 })
 

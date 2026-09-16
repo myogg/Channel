@@ -1,4 +1,3 @@
-import * as cheerio from 'cheerio'
 import { getBooleanEnv, getEnv } from './env'
 
 type Env = Record<string, string | undefined>
@@ -15,9 +14,10 @@ const CHARS_PER_SECOND = 4.8
 
 /**
  * Read-aloud skips everything that is not sentence text: block code, media,
- * embed players, spoiler controls, and link preview cards.
+ * embed players, spoiler controls, and link preview cards. Shared with the
+ * browser-side extractor so the feed and the post page read the same words.
  */
-const unreadableSelector = [
+export const UNREADABLE_SELECTOR = [
   'pre',
   'iframe',
   'svg',
@@ -32,8 +32,8 @@ const unreadableSelector = [
   '.tgme_widget_message_forwarded_from',
 ].join(', ')
 
-/** `.text()` concatenates siblings, so block boundaries need a separator. */
-const blockSelector = 'p, div, section, article, blockquote, li, tr, figcaption, h1, h2, h3, h4, h5, h6'
+/** Text node extraction concatenates siblings, so blocks need a separator. */
+export const BLOCK_SELECTOR = 'p, div, section, article, blockquote, li, tr, figcaption, h1, h2, h3, h4, h5, h6'
 
 export interface TtsConfig {
   api: string
@@ -54,23 +54,6 @@ export function getTtsConfig(env: Env): TtsConfig | null {
     token: getEnv(env, 'TTS_TOKEN') || DEFAULT_TTS_TOKEN,
     voice: getEnv(env, 'TTS_VOICE') || DEFAULT_TTS_VOICE,
   }
-}
-
-/** Flattens sanitized Telegram HTML into the plain sentences read aloud. */
-export function getSpeechText(html: string): string {
-  const $ = cheerio.load(html)
-  $(unreadableSelector).remove()
-  $('br').replaceWith('\n')
-  $(blockSelector).each((_, element) => {
-    $(element).append('\n')
-  })
-
-  return $.root()
-    .text()
-    .replace(/[^\S\n]+/g, ' ')
-    .replace(/ *\n */g, '\n')
-    .replace(/\n{2,}/g, '\n')
-    .trim()
 }
 
 /**
