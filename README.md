@@ -12,7 +12,8 @@ English | [简体中文](./README.zh-cn.md)
 
 - **Turn your Telegram Channel into a MicroBlog**
 - **SEO friendly** `/sitemap.xml`
-- **0 JS on the browser side**
+- **Browser JS only on post detail**, for read-aloud and Telegram comments
+- **Read aloud** with Edge TTS, an estimated duration, and share
 - **RSS and RSS JSON** `/rss.xml` `/rss.json`
 
 ## 🪧 Demo
@@ -156,6 +157,13 @@ HIDE_DESCRIPTION=false
 COMMENTS=true
 REACTIONS=true
 RSS_BEAUTIFY=true
+
+## Read-aloud (Edge TTS). On by default; TTS=false removes the listen bar.
+## TTS_API/TTS_TOKEN default to the public forwarder; use your own to avoid it.
+TTS=true
+TTS_API=https://tts.134688.xyz
+TTS_TOKEN=tts100412
+TTS_VOICE=zh-CN-XiaoxiaoNeural
 
 ## Tags, links, and navigation (comma / semicolon separated)
 TAGS=tag1,tag2,tag3

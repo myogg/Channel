@@ -46,13 +46,14 @@
 - `CHANNEL` is required server-side; missing it throws during Telegram fetch.
 - `TELEGRAM_HOST` defaults in code to `telegram.me`; `.env.example` uses `telegram.dog` as an override example.
 - `STATIC_PROXY` defaults to `/static/` only when unset; set it to an empty string for direct Telegram asset URLs.
+- `TTS` is on unless explicitly `false` or empty; `TTS_API`/`TTS_TOKEN`/`TTS_VOICE` fall back to the public Edge TTS forwarder, and the token reaches the browser by design because playback fetches the API directly.
 - `astro.config.mjs` selects adapters for Vercel, Cloudflare Workers, Netlify, Node standalone, and EdgeOne; `SERVER_ADAPTER` overrides auto-detection, and Cloudflare Pages is explicitly rejected.
 - EdgeOne is detected from std-env's `edgeone_pages` provider or platform-provided `EDGEONE_PROJECT_ID`/`EO_MAKERS`; `DOCKER=true` changes Vite SSR `noExternal` behavior.
 - If env behavior changes, update `.env.example` and README docs together.
 
 ## Code and content conventions
 
-- Server-rendered HTML is the default; keep browser JS near zero. Telegram comments are the deliberate exception.
+- Server-rendered HTML is the default; keep browser JS near zero. Post-detail read-aloud and Telegram comments are the only deliberate exceptions. Read-aloud logic lives in `src/lib/post-audio.ts` and is called from `PostAudio.astro`, not written inline: `format/prettier` and `antfu/if-newline` disagree inside `.astro` script blocks.
 - API-style routes must return `Response`/`Response.json`, not Express-like objects.
 - Follow ESLint formatting: 2 spaces, LF, UTF-8, single quotes, usually no semicolons; let `pnpm lint:fix` settle import order.
 - Preserve local naming: Astro components and layouts use `PascalCase.astro`; pages follow Astro route syntax.

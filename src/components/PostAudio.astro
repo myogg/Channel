@@ -1,0 +1,92 @@
+---
+import { estimateSpeechSeconds, formatSpeechTime } from '../lib/tts'
+import type { TtsConfig } from '../lib/tts'
+
+const { chunks, permalink, config } = Astro.props as {
+  chunks: string[]
+  permalink: string
+  config: TtsConfig
+}
+
+const labels = {
+  idle: '聆听文章',
+  loading: '加载中',
+  pause: '暂停朗读',
+  resume: '继续播放',
+  share: '分享',
+  copied: '已复制链接',
+  copyFailed: '复制失败',
+  failed: '语音合成失败，请稍后重试',
+  synthesizing: '正在合成第 {index}/{total} 段',
+}
+
+const estimated = estimateSpeechSeconds(chunks)
+// The player reads its whole state from this attribute; Astro escapes it for us.
+const payload = JSON.stringify({
+  api: config.api,
+  token: config.token,
+  voice: config.voice,
+  permalink,
+  chunks,
+  labels,
+  estimated,
+})
+---
+
+<div class="post-audio" data-post-audio={payload}>
+  <div class="post-audio-row">
+    <button class="post-audio-toggle" type="button" aria-label={labels.idle} aria-pressed="false">
+      <svg class="post-audio-icon" data-audio-icon="play" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path d="M8 6.82v10.36c0 .79.87 1.27 1.54.84l8.14-5.18a1 1 0 0 0 0-1.68L9.54 5.98A1 1 0 0 0 8 6.82Z"></path>
+      </svg>
+      <svg
+        class="post-audio-icon"
+        data-audio-icon="pause"
+        viewBox="0 0 24 24"
+        fill="currentColor"
+        aria-hidden="true"
+        hidden
+      >
+        <rect x="7" y="5" width="3.6" height="14" rx="1.2"></rect>
+        <rect x="13.4" y="5" width="3.6" height="14" rx="1.2"></rect>
+      </svg>
+      <svg
+        class="post-audio-icon post-audio-spinner"
+        data-audio-icon="loading"
+        viewBox="0 0 24 24"
+        fill="none"
+        aria-hidden="true"
+        hidden
+      >
+        <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" opacity="0.25"></circle>
+        <path d="M12 2a10 10 0 0 1 10 10" stroke="currentColor" stroke-width="3" stroke-linecap="round"></path>
+      </svg>
+    </button>
+    <span class="post-audio-label">{labels.idle}</span>
+    <span class="post-audio-divider" aria-hidden="true"></span>
+    <span class="post-audio-time">{formatSpeechTime(estimated)}</span>
+    <button class="post-audio-share" type="button" aria-label="分享本文">
+      <svg
+        class="post-audio-share-icon"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.8"
+        stroke-linecap="round"
+        aria-hidden="true"
+      >
+        <path d="M9.5 14.5 14.5 9.5"></path>
+        <path d="M13 7.5l1.4-1.4a3.4 3.4 0 0 1 4.8 4.8L17.8 12.3"></path>
+        <path d="M11 16.5l-1.4 1.4a3.4 3.4 0 0 1-4.8-4.8L6.2 11.7"></path>
+      </svg>
+      <span class="post-audio-share-label">{labels.share}</span>
+    </button>
+  </div>
+  <p class="post-audio-status" hidden></p>
+</div>
+
+<script>
+  import { initPostAudio } from '../lib/post-audio'
+
+  initPostAudio()
+</script>

@@ -12,7 +12,8 @@
 
 - **将 Telegram Channel 转为微博客**
 - **SEO 友好** `/sitemap.xml`
-- **浏览器端 0 JS**
+- **浏览器端 JS 仅出现在文章页**，用于朗读和 Telegram 评论
+- **朗读**：基于 Edge TTS 朗读正文，带预估时长与分享
 - **提供 RSS 和 RSS JSON** `/rss.xml` `/rss.json`
 
 ## 🪧 演示
@@ -155,6 +156,13 @@ HIDE_DESCRIPTION=false
 COMMENTS=true
 REACTIONS=true
 RSS_BEAUTIFY=true
+
+## 朗读（Edge TTS）。默认开启；设为 TTS=false 即可隐藏朗读栏。
+## TTS_API/TTS_TOKEN 默认指向公共转发服务，建议换成自己部署的实例。
+TTS=true
+TTS_API=https://tts.134688.xyz
+TTS_TOKEN=tts100412
+TTS_VOICE=zh-CN-XiaoxiaoNeural
 
 ## 标签、链接与导航（英文逗号 / 分号分隔）
 TAGS=标签A,标签B,标签C
