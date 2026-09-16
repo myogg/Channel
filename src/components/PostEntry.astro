@@ -47,7 +47,7 @@ const plainText = hasContent
   : (post.title || '')
 
 const ttsUrl = plainText
-  ? `https://tts.134688.xyz/api/tts?text=${encodeURIComponent(plainText)}&voice=zh-CN-XiaoxiaoNeural`
+  ? `https://tts.134688.xyz/api/synthesis?text=${encodeURIComponent(plainText)}&voiceName=zh-CN-XiaoxiaoNeural`
   : ''
 ---
 
