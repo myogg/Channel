@@ -26,6 +26,29 @@ const hasContent = contentHtml.length > 0
 const hasStoryTitle = post.title.trim().length > 0
 const hasReactions = Boolean(reactionsEnabled && post.reactions?.length > 0)
 const hasTags = post.tags.length > 0
+
+// 把 HTML 转成纯文本，用于 TTS
+function htmlToPlainText(html: string): string {
+  return html
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&amp;/g, '&')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/\s+/g, ' ')
+    .trim()
+    .slice(0, 800) // 限制长度，避免 URL 过长
+}
+
+const plainText = hasContent
+  ? htmlToPlainText(contentHtml)
+  : (post.title || '')
+
+const ttsUrl = plainText
+  ? `https://tts.134688.xyz/api/tts?text=${encodeURIComponent(plainText)}&voice=zh-CN-XiaoxiaoNeural`
+  : ''
 ---
 
 <article class="post-entry" style={{ 'view-transition-name': `post-${post.id}` }}>
@@ -46,6 +69,18 @@ const hasTags = post.tags.length > 0
       <a href={permalink} title={post.datetime}>
         <time datetime={post.datetime} title={timeago}>{timeago}</time>
       </a>
+      {ttsUrl && (
+        <audio
+          class="post-tts-player"
+          controls
+          preload="none"
+          src={ttsUrl}
+          title="播放本篇文章"
+          style="height: 28px; vertical-align: middle; margin-left: 8px; max-width: 220px;"
+        >
+          您的浏览器不支持音频播放
+        </audio>
+      )}
     </p>
   </div>
   {hasContent && <div class="post-content content" set:html={contentHtml} />}
