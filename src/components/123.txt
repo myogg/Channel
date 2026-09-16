@@ -1,0 +1,266 @@
+---
+import { getBooleanEnv, getEnv } from '../lib/env'
+import { sanitizeContentHtml } from '../lib/sanitize'
+import { formatPostTime, getReactionLabel, getTagHref, paidReactionClass } from '../lib/post-ui'
+import type { Post } from '../types'
+
+const locale = getEnv(import.meta.env, 'LOCALE')
+const timezone = getEnv(import.meta.env, 'TIMEZONE')
+
+const { SITE_URL } = Astro.locals
+const { post, isDetail, channelAvatar, channelTitle } = Astro.props as {
+  post: Post
+  isDetail?: boolean
+  channelAvatar?: string
+  channelTitle: string
+}
+
+const channelName = getEnv(import.meta.env, 'CHANNEL')
+const commentsEnabled = getBooleanEnv(import.meta.env, 'COMMENTS')
+const reactionsEnabled = getBooleanEnv(import.meta.env, 'REACTIONS')
+
+const timeago = await formatPostTime(post.datetime, timezone, locale)
+const permalink = `${SITE_URL}posts/${post.id}`
+const contentHtml = sanitizeContentHtml(post.content)
+const hasContent = contentHtml.length > 0
+const hasStoryTitle = post.title.trim().length > 0
+const hasReactions = Boolean(reactionsEnabled && post.reactions?.length > 0)
+const hasTags = post.tags.length > 0
+
+// 把 HTML 转成纯文本，用于 TTS（过滤图片、视频等媒体）
+function htmlToPlainText(html: string): string {
+  return html
+    .replace(/<img\b[^>]*>/gi, '')
+    .replace(/<video\b[^>]*>[\s\S]*?<\/video>/gi, '')
+    .replace(/<audio\b[^>]*>[\s\S]*?<\/audio>/gi, '')
+    .replace(/<iframe\b[^>]*>[\s\S]*?<\/iframe>/gi, '')
+    .replace(/<figure\b[^>]*>[\s\S]*?<\/figure>/gi, '')
+    .replace(/<picture\b[^>]*>[\s\S]*?<\/picture>/gi, '')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&nbsp;/g, ' ')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&amp;/g, '&')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&#\d+;/g, '')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .slice(0, 800)
+}
+
+const plainText = hasContent
+  ? htmlToPlainText(contentHtml)
+  : (post.title || '')
+
+const ttsUrl = plainText
+  ? `https://tts.134688.xyz/api/synthesis?text=${encodeURIComponent(plainText)}&voiceName=zh-CN-XiaoxiaoNeural&token=tts100412`
+  : ''
+
+const audioId = `tts-audio-${post.id}`
+---
+
+<article class="post-entry" style={{ 'view-transition-name': `post-${post.id}` }}>
+  {channelAvatar && <img class="post-entry-avatar" src={channelAvatar} alt="" width="40" height="40" loading="lazy" />}
+  <p class="post-entry-author">{channelTitle}</p>
+  {
+    hasStoryTitle && (
+      <div class="hn-story">
+        <h2>
+          <a href={permalink}>{post.title}</a>
+        </h2>
+      </div>
+    )
+  }
+  <div class="post-meta">
+    <span class="timeline-dot" aria-hidden="true"></span>
+    <p>
+      <a href={permalink} title={post.datetime}>
+        <time datetime={post.datetime} title={timeago}>{timeago}</time>
+      </a>
+    </p>
+  </div>
+
+  {ttsUrl && (
+    <div class="listen-article">
+      <audio id={audioId} src={ttsUrl} preload="none"></audio>
+      <button
+        type="button"
+        class="listen-btn"
+        data-audio-id={audioId}
+        aria-label="聆听文章"
+      >
+        <span class="listen-icon" aria-hidden="true">▶</span>
+        <span class="listen-text">聆听文章</span>
+      </button>
+    </div>
+  )}
+
+  {hasContent && <div class="post-content content" set:html={contentHtml} />}
+  <p class="tg-message-meta">
+    <a href={permalink} title={post.datetime}>
+      <time datetime={post.datetime} title={timeago}>{timeago}</time>
+    </a>
+  </p>
+  {
+    hasReactions && (
+      <div class="post-reactions">
+        <ul role="list" aria-label="Reactions">
+          {post.reactions.map((reaction) => (
+            <li class:list={['reaction', reaction.isPaid && paidReactionClass]} aria-label={getReactionLabel(reaction)}>
+              <span class="reaction-emoji">
+                {reaction.isPaid ? (
+                  '\u2B50'
+                ) : reaction.emojiImage ? (
+                  <img
+                    src={reaction.emojiImage}
+                    alt={reaction.emoji || 'emoji'}
+                    loading="lazy"
+                    width="20"
+                    height="20"
+                    class="reaction-image"
+                  />
+                ) : (
+                  reaction.emoji
+                )}
+              </span>
+              <span class="reaction-count">{reaction.count}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    )
+  }
+  {
+    hasTags && (
+      <p class="tags post-tags">
+        <span class="tag-icon" aria-hidden="true" />
+        {post.tags.map((tag: string) => (
+          <a href={getTagHref(tag)} title={tag}>
+            {tag}
+          </a>
+        ))}
+      </p>
+    )
+  }
+
+  {
+    commentsEnabled && isDetail && (
+      <section class="post-comments" aria-label="Telegram comments">
+        <script
+          is:inline
+          async
+          src="https://telegram.org/js/telegram-widget.js"
+          data-telegram-discussion={`${channelName}/${post.id}`}
+          data-comments-limit="50"
+          data-colorful="1"
+          data-color="454545"
+        >
+          /* Explicit closing avoids an astro-eslint-parser v3 crash. */
+        </script>
+      </section>
+    )
+  }
+</article>
+
+{ttsUrl && (
+  <script is:inline>
+    document.addEventListener('click', function (e) {
+      const btn = e.target.closest('.listen-btn');
+      if (!btn) return;
+      const audio = document.getElementById(btn.getAttribute('data-audio-id'));
+      if (!audio) return;
+
+      // 停止其他正在播放的
+      document.querySelectorAll('audio').forEach(function (a) {
+        if (a !== audio) {
+          a.pause();
+          a.currentTime = 0;
+        }
+      });
+      document.querySelectorAll('.listen-btn').forEach(function (b) {
+        b.classList.remove('is-playing');
+        const icon = b.querySelector('.listen-icon');
+        if (icon) icon.textContent = '▶';
+      });
+
+      if (audio.paused) {
+        audio.play();
+        btn.classList.add('is-playing');
+        const icon = btn.querySelector('.listen-icon');
+        if (icon) icon.textContent = '❚❚';
+      } else {
+        audio.pause();
+        btn.classList.remove('is-playing');
+        const icon = btn.querySelector('.listen-icon');
+        if (icon) icon.textContent = '▶';
+      }
+    });
+
+    document.querySelectorAll('audio').forEach(function (audio) {
+      audio.addEventListener('ended', function () {
+        const btn = document.querySelector('.listen-btn[data-audio-id="' + audio.id + '"]');
+        if (btn) {
+          btn.classList.remove('is-playing');
+          const icon = btn.querySelector('.listen-icon');
+          if (icon) icon.textContent = '▶';
+        }
+      });
+    });
+  </script>
+)}
+
+<style is:global>
+  .listen-article {
+    margin: 0.75rem 0 1rem;
+  }
+  .listen-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem 0.9rem 0.4rem 0.5rem;
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    border-radius: 999px;
+    background: #f5f5f5;
+    color: #111;
+    font-size: 0.9rem;
+    cursor: pointer;
+    line-height: 1.2;
+  }
+  .listen-btn:hover {
+    background: #ebebeb;
+  }
+  .listen-btn.is-playing {
+    background: #e8e8e8;
+  }
+  .listen-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.6rem;
+    height: 1.6rem;
+    border-radius: 50%;
+    background: #111;
+    color: #fff;
+    font-size: 0.7rem;
+  }
+  .listen-text {
+    font-weight: 500;
+  }
+  /* 暗色主题适配（如果有） */
+  @media (prefers-color-scheme: dark) {
+    .listen-btn {
+      background: #2a2a2a;
+      border-color: rgba(255, 255, 255, 0.15);
+      color: #eee;
+    }
+    .listen-btn:hover,
+    .listen-btn.is-playing {
+      background: #333;
+    }
+    .listen-icon {
+      background: #eee;
+      color: #111;
+    }
+  }
+</style>
