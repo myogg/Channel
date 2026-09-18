@@ -37,9 +37,7 @@ function compact(css: string): string {
 describe('bear CSS contract', () => {
   it('keeps the twelve Bear variables at their contract values', () => {
     const variables = {
-      '--width': '800px',
-      '--font-main': 'Verdana, sans-serif',
-      '--font-secondary': 'Verdana, sans-serif',
+      '--width': '680px',
       '--font-scale': '1em',
       '--background-color': '#fff',
       '--heading-color': '#222',
@@ -54,6 +52,11 @@ describe('bear CSS contract', () => {
     for (const [name, value] of Object.entries(variables)) {
       expect(theme).toContain(`${name}: ${value};`)
     }
+
+    const fontStack = 'ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, \'Segoe UI\', Roboto, \'Helvetica Neue\', Arial'
+    expect(theme).toContain('--font-main:')
+    expect(theme).toContain(fontStack)
+    expect(theme).toContain('--font-secondary:')
   })
 
   it('keeps Bear content width inside tokenized border-box padding', () => {

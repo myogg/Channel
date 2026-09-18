@@ -34,18 +34,18 @@ colors:
   sepia-surface: "#fff"
 typography:
   base-body:
-    fontFamily: "Verdana, sans-serif"
+    fontFamily: "ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif"
     fontSize: 1em
     lineHeight: 1.5
   base-main:
-    fontFamily: "Verdana, sans-serif"
+    fontFamily: "ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif"
     fontSize: 1em
     lineHeight: 1.6
   base-heading:
-    fontFamily: "Verdana, sans-serif"
+    fontFamily: "ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif"
     lineHeight: 1.25
   base-site-title:
-    fontFamily: "Verdana, sans-serif"
+    fontFamily: "ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif"
     fontSize: 1.5em
     lineHeight: 1.25
   sepia-body:
@@ -64,7 +64,7 @@ rounded:
   sepia-media: 8px
   reaction-pill: 999px
 spacing:
-  content-width: 800px
+  content-width: 680px
   base-body-padding: 20px
   sepia-body-padding: 1.25rem
   base-main-padding-top: 2rem
@@ -186,7 +186,7 @@ Base and Aria declare `color-scheme: light dark` and follow the system preferenc
 
 ## Typography
 
-Base preserves Bear's public font semantics: body copy and Tailwind's `font-sans` bridge use `--font-secondary`, while `h1`–`h6` use `--font-main`. Both variables resolve to `Verdana, sans-serif`; `--font-scale` is `1em`. The body line height is `1.5`, main content uses `1.6`, and headings use `1.25`.
+Base preserves Bear's public font semantics: body copy and Tailwind's `font-sans` bridge use `--font-secondary`, while `h1`–`h6` use `--font-main`. Both variables resolve to a system sans-serif stack (`ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif`); `--font-scale` is `1em`. The body line height is `1.5`, main content uses `1.6`, and headings use `1.25`.
 
 The Base site title is `1.5em`, reduced to `1.2em` at the small breakpoint. Content headings follow the restrained Tailwind scale already applied in `content/typography.css`, and post metadata is smaller than body copy. Do not introduce a separate display face or enlarge feed typography into a magazine-style hierarchy.
 
@@ -194,7 +194,7 @@ Sepia intentionally replaces both public font families with its system sans-seri
 
 ## Layout
 
-`--width` is the maximum content width, not the body's outer border-box width. The centered body remains `box-sizing: border-box`; its outer maximum adds twice the internal `--body-padding-inline` to `--width`, so horizontal padding does not consume the documented content width. Base is `800px + 20px + 20px`. Sepia, Aria, and Terminal keep `--body-padding-inline` synchronized with their actual horizontal body padding (`1.25rem`, `1.5rem`, and `clamp(1rem, 4vw, 2.5rem)` respectively). HN News, TG Channel, and ZAE set that token and body inline padding to zero, then place responsive spacing on their inner regions. The header, navigation, full feed, pagination, and footer remain in one column; there is no public desktop sidebar.
+`--width` is the maximum content width, not the body's outer border-box width. The centered body remains `box-sizing: border-box`; its outer maximum adds twice the internal `--body-padding-inline` to `--width`, so horizontal padding does not consume the documented content width. Base is `680px + 20px + 20px`. Sepia, Aria, and Terminal keep `--body-padding-inline` synchronized with their actual horizontal body padding (`1.25rem`, `1.5rem`, and `clamp(1rem, 4vw, 2.5rem)` respectively). HN News, TG Channel, and ZAE set that token and body inline padding to zero, then place responsive spacing on their inner regions. The header, navigation, full feed, pagination, and footer remain in one column; there is no public desktop sidebar.
 
 Base uses `37.5rem` as both Tailwind's `sm` bridge and the explicit mobile `max-width` breakpoint. At that boundary the header becomes two columns, the avatar and title shrink, social links move below them, desktop search is hidden, and the accessible `<details>` mobile search appears. Sepia uses the same breakpoint for its feed and directory adjustments.
 
