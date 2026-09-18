@@ -55,8 +55,10 @@
   }
 
   .post-audio {
-    display: inline-flex;
+    display: flex;
     align-items: center;
+    flex: 1 1 100%;
+    min-width: 0;
   }
 
   .post-audio-row {
