@@ -50,6 +50,10 @@
     text-decoration: underline;
   }
 
+  .post-time-month {
+    color: #dc2626;
+  }
+
   .timeline-dot {
     display: none;
   }
@@ -57,14 +61,14 @@
   .post-audio {
     display: flex;
     align-items: center;
-    flex: 1 1 100%;
-    min-width: 0;
+    width: 100%;
   }
 
   .post-audio-row {
     display: flex;
     align-items: center;
     gap: 0.4rem;
+    width: 100%;
   }
 
   .post-audio-toggle {
