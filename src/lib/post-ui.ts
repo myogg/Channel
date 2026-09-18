@@ -37,23 +37,19 @@ function formatRelativeTime(date: Date, locale: string): string {
   return formatter.format(roundRelativeTime(diffInMs, 24 * 60 * 60 * 1000), 'day')
 }
 
-function formatAbsoluteTime(date: Date, timezone: string | undefined, locale: string): string {
-  const time = new Intl.DateTimeFormat(locale, {
-    hour: '2-digit',
-    hourCycle: 'h23',
-    minute: '2-digit',
+function formatAbsoluteTime(date: Date, timezone: string | undefined, _locale: string): string {
+  const formatter = new Intl.DateTimeFormat('zh-CN', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
     timeZone: timezone,
-  }).format(date)
-  const dateText = new Intl.DateTimeFormat(locale, {
-    dateStyle: 'medium',
-    timeZone: timezone,
-  }).format(date)
-  const weekday = new Intl.DateTimeFormat(locale, {
-    timeZone: timezone,
-    weekday: 'short',
-  }).format(date)
+  })
+  const parts = formatter.formatToParts(date)
+  const year = parts.find(p => p.type === 'year')?.value ?? ''
+  const month = parts.find(p => p.type === 'month')?.value ?? ''
+  const day = parts.find(p => p.type === 'day')?.value ?? ''
 
-  return `${time} · ${dateText} · ${weekday}`
+  return `${year}年${month}月${day}日`
 }
 
 export function formatPostTime(datetime: string, timezone?: string, locale?: string): string {

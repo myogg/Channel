@@ -53,8 +53,8 @@ const hasSpeechText = contentHtml.replace(/<[^>]*>/g, '').trim().length > 0
         <time datetime={post.datetime} title={timeago}>{timeago}</time>
       </a>
     </p>
+    {ttsConfig && hasSpeechText && <PostAudio permalink={permalink} config={ttsConfig} />}
   </div>
-  {ttsConfig && hasSpeechText && <PostAudio permalink={permalink} config={ttsConfig} />}
   {hasContent && <div class="post-content content" set:html={contentHtml} />}
   <p class="tg-message-meta">
     <a href={permalink} title={post.datetime}>
