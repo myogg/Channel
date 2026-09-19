@@ -24,7 +24,10 @@ const reactionsEnabled = getBooleanEnv(import.meta.env, 'REACTIONS')
 const timeParts = await formatPostTime(post.datetime, timezone, locale)
 const timeTitle = `${timeParts.month} ${timeParts.day}, ${timeParts.year}`
 const permalink = `${SITE_URL}posts/${post.id}`
-const contentHtml = sanitizeContentHtml(post.content)
+const rawContentHtml = sanitizeContentHtml(post.content)
+const contentHtml = isDetail
+  ? rawContentHtml
+  : rawContentHtml.replace(/<a[^>]*href="\/search\/result\?q=%23[^"]*"[^>]*>[^<]*<\/a>/g, '')
 const hasContent = contentHtml.length > 0
 const hasStoryTitle = post.title.trim().length > 0
 const hasReactions = Boolean(reactionsEnabled && post.reactions?.length > 0)
