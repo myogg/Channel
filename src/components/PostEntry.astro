@@ -52,7 +52,8 @@ const hasSpeechText = contentHtml.replace(/<[^>]*>/g, '').trim().length > 0
     <p>
       <a href={permalink} title={post.datetime}>
         <time datetime={post.datetime} title={timeTitle}>
-          <span class="post-time-month">{timeParts.month}</span> {timeParts.day}, {timeParts.year}
+          <span class="post-time-month">{timeParts.month}</span>
+          {timeParts.day}, {timeParts.year}
         </time>
       </a>
     </p>
@@ -62,7 +63,8 @@ const hasSpeechText = contentHtml.replace(/<[^>]*>/g, '').trim().length > 0
   <p class="tg-message-meta">
     <a href={permalink} title={post.datetime}>
       <time datetime={post.datetime} title={timeTitle}>
-        <span class="post-time-month">{timeParts.month}</span> {timeParts.day}, {timeParts.year}
+        <span class="post-time-month">{timeParts.month}</span>
+        {timeParts.day}, {timeParts.year}
       </time>
     </a>
   </p>

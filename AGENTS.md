@@ -2,8 +2,7 @@
 
 ## Sources
 
-- Treat this file as the maintained repo guide. `CLAUDE.md` is a symlink to this file for Claude Code compatibility.
-- No repo-local `opencode.json`, `.opencode/`, `.cursor/rules/`, `.cursorrules`, or `.github/copilot-instructions.md` is present.
+- Treat this file as the maintained repo guide. `CLAUDE.md` is a symlink to this file.
 - For any visible UI/design change, read `DESIGN.md` first; implementation tokens live in `src/styles/app/**` and `src/styles/content/**`.
 - Theme provenance and third-party acknowledgements are maintained in `NOTICE.md`.
 
@@ -16,7 +15,7 @@
 
 ## Stack and commands
 
-- Runtime/tooling: Node `v22`, `pnpm@11.6.0`, Astro `^6.4.6` SSR, Tailwind CSS v4 via `@tailwindcss/vite`, ESLint `^10.4.1` with Antfu + Astro + formatter rules.
+- Runtime/tooling: Node `v22`, `pnpm@10`, Astro `^7.0.9` SSR, Tailwind CSS v4 via `@tailwindcss/vite`, ESLint `^10.7.0` with Antfu + Astro + formatter rules.
 - Install/dev/build: `pnpm install`, `pnpm dev` or `pnpm start` (`astro dev`), `pnpm build`, `pnpm preview`.
 - Local checks: `pnpm lint`, `pnpm typecheck`, and `pnpm test`; use `pnpm lint:fix` for auto-fix, `pnpm eslint <path>` for focused lint, and `pnpm vitest run <test-file>` for a focused test.
 - `postinstall` installs `simple-git-hooks` when `.git` exists; pre-commit runs `lint-staged` with `eslint --fix`.

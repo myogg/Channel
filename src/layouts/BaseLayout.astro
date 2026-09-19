@@ -2,6 +2,7 @@
 import '../styles/app.css'
 import { SEO } from 'astro-seo'
 import BackToTop from '../components/BackToTop.astro'
+import ImageLightbox from '../components/ImageLightbox.astro'
 import SiteHeader from '../components/SiteHeader.astro'
 import SiteNavigation from '../components/SiteNavigation.astro'
 import SiteFooter from '../components/SiteFooter.astro'
@@ -81,6 +82,7 @@ const skipLinkText = 'Skip to main content'
     </main>
     <SiteFooter />
     <BackToTop />
+    <ImageLightbox />
     <Fragment set:html={FOOTER_INJECT} />
   </body>
 </html>
