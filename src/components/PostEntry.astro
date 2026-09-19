@@ -28,7 +28,8 @@ const contentHtml = sanitizeContentHtml(post.content)
 const hasContent = contentHtml.length > 0
 const hasStoryTitle = post.title.trim().length > 0
 const hasReactions = Boolean(reactionsEnabled && post.reactions?.length > 0)
-const hasTags = post.tags.length > 0
+const displayTags = isDetail ? post.tags : post.tags.filter((t: string) => !t.startsWith('#'))
+const hasTags = displayTags.length > 0
 
 const ttsConfig = getTtsConfig(import.meta.env)
 // The browser reads the rendered body, so this only skips posts with no text.
@@ -101,7 +102,7 @@ const hasSpeechText = contentHtml.replace(/<[^>]*>/g, '').trim().length > 0
     hasTags && (
       <p class="tags post-tags">
         <span class="tag-icon" aria-hidden="true" />
-        {post.tags.map((tag: string) => (
+        {displayTags.map((tag: string) => (
           <a href={getTagHref(tag)} title={tag}>
             {tag}
           </a>
