@@ -1,3 +1,7 @@
+# AGENTS.md
+
+This file provides guidance to the AI agent when working with code in this repository.
+
 # Repository Guide for Coding Agents
 
 ## Sources
