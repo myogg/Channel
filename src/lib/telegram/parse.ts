@@ -119,6 +119,9 @@ export async function extractPost($: CheerioAPI, item: AnyNode | null, options: 
     { index, telegramHost, staticProxy, normalizeUrls: false },
   )
   const contentText = content.text()
+  const description = contentText.length > 150
+    ? `${contentText.slice(0, 150).trim()}…`
+    : contentText
   const title = contentText.match(TITLE_PREVIEW_REGEX)?.[0] ?? contentText
   const id = message.attr('data-post')?.replace(new RegExp(`${channel}/`, 'i'), '') ?? ''
   const tags = rewriteTagLinksAndCollectTags($, content)
@@ -127,6 +130,7 @@ export async function extractPost($: CheerioAPI, item: AnyNode | null, options: 
   return {
     id,
     title,
+    description,
     type: message.attr('class')?.includes('service_message') ? 'service' : 'text',
     datetime: message.find('.tgme_widget_message_date time').attr('datetime') ?? '',
     tags,

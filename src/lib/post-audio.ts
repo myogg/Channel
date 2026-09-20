@@ -33,6 +33,11 @@ function readableText(root: Element): string {
   for (const node of clone.querySelectorAll(UNREADABLE_SELECTOR))
     node.remove()
 
+  for (const a of clone.querySelectorAll('a')) {
+    if (/^https?:\/\/\S+$/.test(a.textContent?.trim() || ''))
+      a.remove()
+  }
+
   for (const br of clone.querySelectorAll('br'))
     br.replaceWith('\n')
 
