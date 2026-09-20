@@ -45,6 +45,7 @@ function readableText(root: Element): string {
     block.append('\n')
 
   return (clone.textContent || '')
+    .replace(/https?:\/\/[\w\-.~:/?#[\]@!$&'*+,;=%]+(?<![.!?])/g, '')
     .replace(/[^\S\n]+/g, ' ')
     .replace(/ *\n */g, '\n')
     .replace(/\n{2,}/g, '\n')
