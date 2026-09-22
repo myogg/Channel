@@ -14,8 +14,6 @@ export const POST_AUDIO_LABELS = {
 }
 
 interface PostAudioConfig {
-  api: string
-  token: string
   voice: string
   permalink: string
 }
@@ -79,7 +77,7 @@ function initPlayer(player: HTMLElement): void {
     return
   }
 
-  const { api, token, voice, permalink } = JSON.parse(payload) as PostAudioConfig
+  const { voice, permalink } = JSON.parse(payload) as PostAudioConfig
   const estimated = estimateSpeechSeconds(chunks)
   const blobs = new Map<number, Blob>()
   const durations: number[] = []
@@ -155,8 +153,8 @@ function initPlayer(player: HTMLElement): void {
     if (cached)
       return cached
 
-    const params = new URLSearchParams({ text: chunks[i], voiceName: voice, token })
-    const res = await fetch(`${api}/api/synthesis?${params}`, { signal: abortController?.signal })
+    const params = new URLSearchParams({ text: chunks[i], voiceName: voice })
+    const res = await fetch(`/api/tts?${params}`, { signal: abortController?.signal })
     if (!res.ok)
       throw new Error('TTS request failed')
 

@@ -150,7 +150,7 @@ RSS_BEAUTIFY=true
 ## 朗读（Edge TTS）。默认开启；设为 TTS=false 即可隐藏朗读栏。
 ## TTS_API/TTS_TOKEN 默认指向公共转发服务，建议换成自己部署的实例。
 TTS=true
-TTS_API=https://tts.134688.xyz
+TTS_API=https://read-tts.xxjss-c4e.workers.dev
 TTS_TOKEN=tts100412
 TTS_VOICE=zh-CN-XiaoxiaoNeural
 

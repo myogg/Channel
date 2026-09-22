@@ -9,8 +9,6 @@ const { permalink, config } = Astro.props as {
 }
 
 const payload = JSON.stringify({
-  api: config.api,
-  token: config.token,
   voice: config.voice,
   permalink,
 })
