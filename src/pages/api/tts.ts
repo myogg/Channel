@@ -1,10 +1,11 @@
 import type { APIContext } from 'astro'
+import { DEFAULT_TTS_API, DEFAULT_TTS_TOKEN } from '../../lib/tts'
 
 export async function GET(context: APIContext): Promise<Response> {
-  const { url, env } = context
+  const { url } = context
 
-  const ttsApi = (env.TTS_API as string) || 'https://read-tts.xxjss-c4e.workers.dev'
-  const ttsToken = (env.TTS_TOKEN as string) || ''
+  const ttsApi = process.env.TTS_API || DEFAULT_TTS_API
+  const ttsToken = process.env.TTS_TOKEN || DEFAULT_TTS_TOKEN
 
   const text = url.searchParams.get('text')
   const voiceName = url.searchParams.get('voiceName') || 'zh-CN-XiaoxiaoNeural'
