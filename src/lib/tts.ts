@@ -2,7 +2,7 @@ import { getBooleanEnv, getEnv } from './env'
 
 type Env = Record<string, string | undefined>
 
-export const DEFAULT_TTS_API = 'https://read-tts.xxjss-c4e.workers.dev'
+export const DEFAULT_TTS_API = 'https://tts.134688.xyz'
 export const DEFAULT_TTS_TOKEN = ''
 export const DEFAULT_TTS_VOICE = 'zh-CN-XiaoxiaoNeural'
 
