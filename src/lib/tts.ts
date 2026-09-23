@@ -3,7 +3,7 @@ import { getBooleanEnv, getEnv } from './env'
 type Env = Record<string, string | undefined>
 
 export const DEFAULT_TTS_API = 'https://read-tts.xxjss-c4e.workers.dev'
-export const DEFAULT_TTS_TOKEN = 'tts100412'
+export const DEFAULT_TTS_TOKEN = ''
 export const DEFAULT_TTS_VOICE = 'zh-CN-XiaoxiaoNeural'
 
 /** Keeps every synthesis request inside the forwarder's practical text limit. */
