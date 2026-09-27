@@ -11,6 +11,7 @@
       max-width: 100% !important;
       height: auto !important;
       display: block;
+      aspect-ratio: auto !important;
     }
 
     .image-list-container {
