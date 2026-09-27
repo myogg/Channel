@@ -6,6 +6,12 @@
       max-height: initial;
     }
 
+    video:not(.sticker) {
+      width: calc(100% - var(--box-margin));
+      max-width: calc(100% - 1px);
+      height: auto;
+    }
+
     .image-list-container {
       @apply grid grid-cols-2;
       grid-template-rows: masonry;
