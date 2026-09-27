@@ -11,6 +11,9 @@ export function getVideo($: CheerioAPI, message: MessageSelection, options: Inde
     video.attr('src', getProxiedUrl(staticProxy, videoSrc))
   }
 
+  // Remove intrinsic width/height attributes so CSS can control dimensions
+  video.removeAttr('width').removeAttr('height')
+
   video
     .attr('controls', '')
     .attr('preload', index > 15 ? 'metadata' : 'auto')
@@ -23,6 +26,9 @@ export function getVideo($: CheerioAPI, message: MessageSelection, options: Inde
   if (roundVideoSrc) {
     roundVideo.attr('src', getProxiedUrl(staticProxy, roundVideoSrc))
   }
+
+  // Remove intrinsic width/height attributes so CSS can control dimensions
+  roundVideo.removeAttr('width').removeAttr('height')
 
   roundVideo
     .attr('controls', '')
