@@ -7,9 +7,10 @@
     }
 
     video:not(.sticker) {
-      width: calc(100% - var(--box-margin));
-      max-width: calc(100% - 1px);
-      height: auto;
+      width: 100% !important;
+      max-width: 100% !important;
+      height: auto !important;
+      display: block;
     }
 
     .image-list-container {
