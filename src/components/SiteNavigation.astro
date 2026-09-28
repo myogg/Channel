@@ -14,6 +14,7 @@ const {
   siteRootPathname,
   siteUrl,
   tagsPathname,
+  archivePathname,
 } = Astro.props as {
   channelTitle?: string
   currentPathname: string
@@ -26,6 +27,7 @@ const {
   siteRootPathname: string
   siteUrl: string
   tagsPathname: string
+  archivePathname: string
 }
 
 const primaryNavItems = [
@@ -43,6 +45,11 @@ const primaryNavItems = [
     href: `${siteUrl}links`,
     pathname: linksPathname,
     title: 'Links',
+  },
+  {
+    href: `${siteUrl}archive`,
+    pathname: archivePathname,
+    title: 'Archive',
   },
 ].filter((item): item is { href: string; pathname: string; title: string } => Boolean(item))
 ---

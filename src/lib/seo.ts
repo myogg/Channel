@@ -53,6 +53,7 @@ export function getPageSeo(options: {
 
   return {
     absoluteSiteUrl,
+    archivePathname: normalizePathname(new URL('archive', absoluteSiteUrl).pathname),
     canonical,
     currentPathname,
     hasCustomTitle: Boolean(pageTitle && pageTitle !== siteTitle),

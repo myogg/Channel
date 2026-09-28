@@ -1,0 +1,61 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro'
+import { getChannelInfo } from '../lib/telegram'
+import type { Post } from '../types'
+
+const { SITE_URL } = Astro.locals
+const channel = await getChannelInfo()
+const pageSeo = { title: 'Archive' }
+
+interface MonthGroup {
+  year: number
+  month: number
+  label: string
+  posts: Post[]
+}
+
+const groups: MonthGroup[] = []
+for (const post of channel.posts) {
+  const date = new Date(post.datetime)
+  const year = date.getFullYear()
+  const month = date.getMonth() + 1
+  const label = `${year}-${String(month).padStart(2, '0')}`
+
+  const lastGroup = groups[groups.length - 1]
+  if (lastGroup && lastGroup.year === year && lastGroup.month === month) {
+    lastGroup.posts.push(post)
+  } else {
+    groups.push({ year, month, label, posts: [post] })
+  }
+}
+---
+
+<BaseLayout channel={channel} seo={pageSeo} pageType="page">
+  <section class="archive" aria-labelledby="archive-title">
+    <h1 id="archive-title">Archive</h1>
+
+    <div class="archive-timeline">
+      {
+        groups.map((group) => (
+          <div class="archive-group">
+            <div class="archive-month-badge">{group.label}</div>
+            <ul class="archive-posts" role="list">
+              {group.posts.map((post) => {
+                const day = new Date(post.datetime).getDate()
+                return (
+                  <li class="archive-post">
+                    <span class="archive-dot" aria-hidden="true" />
+                    <span class="archive-day">{String(day).padStart(2, '0')}</span>
+                    <a href={`${SITE_URL}posts/${post.id}`} class="archive-title">
+                      {post.title || post.id}
+                    </a>
+                  </li>
+                )
+              })}
+            </ul>
+          </div>
+        ))
+      }
+    </div>
+  </section>
+</BaseLayout>

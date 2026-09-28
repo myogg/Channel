@@ -20,14 +20,22 @@ const { channel, pageClass, pageType, seo } = Astro.props as {
 
 const locale = getEnv(import.meta.env, 'LOCALE')
 const twitter = getEnv(import.meta.env, 'TWITTER')
-const { currentPathname, hasCustomTitle, linksPathname, seoParams, siteRootPathname, siteTitle, tagsPathname } =
-  getPageSeo({
-    channel,
-    locale,
-    seo,
-    siteUrl: SITE_URL,
-    url: Astro.url,
-  })
+const {
+  archivePathname,
+  currentPathname,
+  hasCustomTitle,
+  linksPathname,
+  seoParams,
+  siteRootPathname,
+  siteTitle,
+  tagsPathname,
+} = getPageSeo({
+  channel,
+  locale,
+  seo,
+  siteUrl: SITE_URL,
+  url: Astro.url,
+})
 
 const GOOGLE_SEARCH_SITE = getEnv(import.meta.env, 'GOOGLE_SEARCH_SITE')
 const searchAction = GOOGLE_SEARCH_SITE ? 'https://www.google.com/search' : `${SITE_URL}search/result`
@@ -64,6 +72,7 @@ const skipLinkText = 'Skip to main content'
     <a href="#main-content" class="skip-link">{skipLinkText}</a>
     <SiteHeader channel={channel}>
       <SiteNavigation
+        archivePathname={archivePathname}
         channelTitle={channel?.title}
         currentPathname={currentPathname}
         googleSearchSite={GOOGLE_SEARCH_SITE}
