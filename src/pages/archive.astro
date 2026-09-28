@@ -1,10 +1,11 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro'
-import { getChannelInfo } from '../lib/telegram'
+import { getChannelInfo, getAllChannelPosts } from '../lib/telegram'
 import type { Post } from '../types'
 
 const { SITE_URL } = Astro.locals
 const channel = await getChannelInfo()
+const posts = await getAllChannelPosts()
 const pageSeo = { title: 'Archive' }
 
 interface MonthGroup {
@@ -15,7 +16,7 @@ interface MonthGroup {
 }
 
 const groups: MonthGroup[] = []
-for (const post of channel.posts) {
+for (const post of posts) {
   const date = new Date(post.datetime)
   const year = date.getFullYear()
   const month = date.getMonth() + 1
@@ -27,6 +28,10 @@ for (const post of channel.posts) {
   } else {
     groups.push({ year, month, label, posts: [post] })
   }
+}
+
+function truncate(text: string, max = 20): string {
+  return text.length > max ? `${text.slice(0, max)}…` : text
 }
 ---
 
@@ -47,7 +52,7 @@ for (const post of channel.posts) {
                     <span class="archive-dot" aria-hidden="true" />
                     <span class="archive-day">{String(day).padStart(2, '0')}</span>
                     <a href={`${SITE_URL}posts/${post.id}`} class="archive-title">
-                      {post.title || post.id}
+                      {truncate(post.title || post.id)}
                     </a>
                   </li>
                 )

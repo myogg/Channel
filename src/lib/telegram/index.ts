@@ -36,3 +36,31 @@ export async function getChannelInfo(params: GetChannelInfoParams = {}): Promise
 
   return channelInfo
 }
+
+export async function getAllChannelPosts(maxPages = 20): Promise<Post[]> {
+  const allPosts: Post[] = []
+  let beforeCursor = ''
+
+  for (let page = 0; page < maxPages; page++) {
+    const info = await getChannelInfo({ before: beforeCursor })
+    if (info.posts.length === 0)
+      break
+
+    allPosts.push(...info.posts)
+
+    const oldestId = info.posts[info.posts.length - 1]?.id
+    if (!oldestId || Number(oldestId) <= 1)
+      break
+    beforeCursor = oldestId
+  }
+
+  const seen = new Set<string>()
+  return allPosts
+    .filter((post) => {
+      if (seen.has(post.id))
+        return false
+      seen.add(post.id)
+      return true
+    })
+    .sort((a, b) => Number(b.id) - Number(a.id))
+}
