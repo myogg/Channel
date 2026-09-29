@@ -148,13 +148,6 @@ COMMENTS=true
 REACTIONS=true
 RSS_BEAUTIFY=true
 
-## Read-aloud (Edge TTS). On by default; TTS=false removes the listen bar.
-## TTS_API/TTS_TOKEN default to the public forwarder; use your own to avoid it.
-TTS=true
-TTS_API=https://read-tts.xxjss-c4e.workers.dev
-TTS_TOKEN=tts100412
-TTS_VOICE=zh-CN-XiaoxiaoNeural
-
 ## Tags, links, and navigation (comma / semicolon separated)
 TAGS=tag1,tag2,tag3
 LINKS=Title1,URL1;Title2,URL2;Title3,URL3;
