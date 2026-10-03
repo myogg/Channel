@@ -147,13 +147,6 @@ COMMENTS=true
 REACTIONS=true
 RSS_BEAUTIFY=true
 
-## 朗读（Edge TTS）。默认开启；设为 TTS=false 即可隐藏朗读栏。
-## TTS_API/TTS_TOKEN 默认指向公共转发服务，建议换成自己部署的实例。
-TTS=true
-TTS_API=https://tts.100412.xyz
-TTS_TOKEN=ra_haivjIMNVML8GHXBuWqWDNQK
-TTS_VOICE=zh-CN-XiaoxiaoNeural
-
 ## 标签、链接与导航（英文逗号 / 分号分隔）
 TAGS=标签A,标签B,标签C
 LINKS=Title1,URL1;Title2,URL2;Title3,URL3;
