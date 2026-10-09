@@ -1,6 +1,6 @@
 import type { APIContext } from 'astro'
 import { getEnv } from '../../lib/env'
-import { DEFAULT_TTS_API, DEFAULT_TTS_TOKEN } from '../../lib/tts'
+import { DEFAULT_TTS_API, DEFAULT_TTS_TOKEN, DEFAULT_TTS_VOICE } from '../../lib/tts'
 
 export async function GET(context: APIContext): Promise<Response> {
   const { url } = context
@@ -10,7 +10,7 @@ export async function GET(context: APIContext): Promise<Response> {
   const ttsToken = getEnv(env, 'TTS_TOKEN') || DEFAULT_TTS_TOKEN
 
   const text = url.searchParams.get('text')
-  const voiceName = url.searchParams.get('voiceName') || 'zh-CN-XiaoxiaoNeural'
+  const voiceName = url.searchParams.get('voiceName') || DEFAULT_TTS_VOICE
 
   if (!text) {
     return new Response('Missing text parameter', { status: 400 })
