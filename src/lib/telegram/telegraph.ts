@@ -44,7 +44,8 @@ async function fetchTelegraphArticle(url: string): Promise<TelegraphArticle | nu
   article.find('script, style, iframe, object, embed, form, input, button, noscript').remove()
   article.find('*').each((_, node) => {
     const element = $(node)
-    for (const attribute of Object.keys(node.attribs ?? {})) {
+    const attributes = (node as { attribs?: Record<string, string> }).attribs ?? {}
+    for (const attribute of Object.keys(attributes)) {
       if (/^on/i.test(attribute))
         element.removeAttr(attribute)
     }
