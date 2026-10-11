@@ -28,6 +28,8 @@ const rawContentHtml = sanitizeContentHtml(post.content)
 const contentHtml = isDetail
   ? rawContentHtml
   : rawContentHtml.replace(/<a[^>]*href="\/search\/result\?q=%23[^"]*"[^>]*>[^<]*<\/a>/g, '')
+// Telegraph/Graph.org links need a calmer presentation than ordinary Telegram posts.
+const isTelegraphPost = /(?:telegra\.ph|graph\.org)/i.test(rawContentHtml)
 const hasContent = contentHtml.length > 0
 const hasStoryTitle = post.title.trim().length > 0
 const hasReactions = Boolean(reactionsEnabled && post.reactions?.length > 0)
@@ -63,7 +65,7 @@ const hasSpeechText = contentHtml.replace(/<[^>]*>/g, '').trim().length > 0
     </p>
     {ttsConfig && hasSpeechText && <PostAudio permalink={permalink} config={ttsConfig} />}
   </div>
-  {hasContent && <div class="post-content content" set:html={contentHtml} />}
+  {hasContent && <div class:list={['post-content', 'content', isTelegraphPost && 'post-content--telegraph']} set:html={contentHtml} />}
   <p class="tg-message-meta">
     <a href={permalink} title={post.datetime}>
       <time datetime={post.datetime} title={timeTitle}>
