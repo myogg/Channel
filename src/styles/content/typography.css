@@ -97,6 +97,19 @@
       line-break: anywhere;
     }
 
+    /* Telegraph-linked posts should read like articles, not a wall of blue links. */
+    &.post-content--telegraph a:link,
+    &.post-content--telegraph a:visited {
+      color: inherit;
+      text-decoration: underline;
+      text-decoration-color: color-mix(in srgb, currentColor 38%, transparent);
+      text-underline-offset: 0.15em;
+    }
+
+    &.post-content--telegraph a:hover {
+      text-decoration-color: currentColor;
+    }
+
     pre {
       @apply whitespace-pre-wrap p-2.5;
       background-color: var(--code-background-color);
