@@ -6,6 +6,7 @@ import { getCustomEmojiImage, normalizeEmoji } from './emoji'
 import { getAudio, getForwardedFrom, getImages, getImageStickers, getLinkPreview, getReply, getTgsStickers, getVideo, getVideoStickers } from './media'
 import { renderRawContent } from './renderers/raw'
 import { normalizeUrlAttributes } from './url'
+import { getTelegraphArticle } from './telegraph'
 
 const TITLE_PREVIEW_REGEX = /^.*?(?=[。\n]|http\S)/g
 
@@ -118,7 +119,19 @@ export async function extractPost($: CheerioAPI, item: AnyNode | null, options: 
     message.find(hasReplyText ? '.tgme_widget_message_text.js-message_text' : '.tgme_widget_message_text'),
     { index, telegramHost, staticProxy, normalizeUrls: false },
   )
-  const contentText = content.text()
+  let contentText = content.text()
+  const telegraphHref = content.find('a[href]').toArray()
+    .map(node => $(node).attr('href') ?? '')
+    .find(href => /^(https?:\\/\\/)?(www\\.)?(telegra\\.ph|graph\\.org)\\//i.test(href))
+
+  if (telegraphHref) {
+    const article = await getTelegraphArticle(telegraphHref)
+    if (article) {
+      content.empty().append(article.html)
+      contentText = article.text
+    }
+  }
+
   const description = contentText.length > 150
     ? `${contentText.slice(0, 150).trim()}…`
     : contentText
