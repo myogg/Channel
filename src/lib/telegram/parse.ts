@@ -119,10 +119,19 @@ export async function extractPost($: CheerioAPI, item: AnyNode | null, options: 
     message.find(hasReplyText ? '.tgme_widget_message_text.js-message_text' : '.tgme_widget_message_text'),
     { index, telegramHost, staticProxy, normalizeUrls: false },
   )
-  let contentText = content.text()
+  const telegramText = content.text()
+  let contentText = telegramText
   const telegraphHref = content.find('a[href]').toArray()
     .map(node => $(node).attr('href') ?? '')
-    .find(href => /^(https?:\\/\\/)?(www\\.)?(telegra\\.ph|graph\\.org)\\//i.test(href))
+    .find((href) => {
+      try {
+        const hostname = new URL(href).hostname.toLowerCase()
+        return ['telegra.ph', 'www.telegra.ph', 'graph.org', 'www.graph.org'].includes(hostname)
+      }
+      catch {
+        return false
+      }
+    })
 
   if (telegraphHref) {
     const article = await getTelegraphArticle(telegraphHref)
@@ -135,7 +144,7 @@ export async function extractPost($: CheerioAPI, item: AnyNode | null, options: 
   const description = contentText.length > 150
     ? `${contentText.slice(0, 150).trim()}…`
     : contentText
-  const title = contentText.match(TITLE_PREVIEW_REGEX)?.[0] ?? contentText
+  const title = telegramText.match(TITLE_PREVIEW_REGEX)?.[0] ?? telegramText
   const id = message.attr('data-post')?.replace(new RegExp(`${channel}/`, 'i'), '') ?? ''
   const tags = rewriteTagLinksAndCollectTags($, content)
   const contentHtml = renderPostContent($, message, content, { channel, staticProxy, index, id, title })
