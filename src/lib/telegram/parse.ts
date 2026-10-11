@@ -42,9 +42,10 @@ function renderPostContent(
     index: number
     id: string
     title: string
+    telegraphExpanded?: boolean
   },
 ): string {
-  const { channel, staticProxy, index, id, title } = options
+  const { channel, staticProxy, index, id, title, telegraphExpanded = false } = options
 
   return [
     getForwardedFrom($, message),
@@ -57,7 +58,7 @@ function renderPostContent(
     getTgsStickers($, message, { staticProxy, index }),
     getVideoStickers($, message, { staticProxy, index }),
     ...renderRawContent($, message, { staticProxy }),
-    getLinkPreview($, message, { staticProxy, index }),
+    !telegraphExpanded ? getLinkPreview($, message, { staticProxy, index }) : '',
   ]
     .filter(isNonEmptyString)
     .join('')
@@ -121,6 +122,7 @@ export async function extractPost($: CheerioAPI, item: AnyNode | null, options: 
   )
   const telegramText = content.text()
   let contentText = telegramText
+  let telegraphExpanded = false
   const telegraphHref = content.find('a[href]').toArray()
     .map(node => $(node).attr('href') ?? '')
     .find((href) => {
@@ -137,7 +139,9 @@ export async function extractPost($: CheerioAPI, item: AnyNode | null, options: 
     const article = await getTelegraphArticle(telegraphHref)
     if (article) {
       content.empty().append(article.html)
+      content.append(`<p><a href="${article.url}" target="_blank" rel="noopener noreferrer">查看 Telegraph 原文</a></p>`)
       contentText = article.text
+      telegraphExpanded = true
     }
   }
 
@@ -147,7 +151,7 @@ export async function extractPost($: CheerioAPI, item: AnyNode | null, options: 
   const title = telegramText.match(TITLE_PREVIEW_REGEX)?.[0] ?? telegramText
   const id = message.attr('data-post')?.replace(new RegExp(`${channel}/`, 'i'), '') ?? ''
   const tags = rewriteTagLinksAndCollectTags($, content)
-  const contentHtml = renderPostContent($, message, content, { channel, staticProxy, index, id, title })
+  const contentHtml = renderPostContent($, message, content, { channel, staticProxy, index, id, title, telegraphExpanded })
 
   return {
     id,
