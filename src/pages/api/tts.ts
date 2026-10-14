@@ -19,6 +19,9 @@ export async function GET(context: APIContext): Promise<Response> {
   const params = new URLSearchParams({
     text,
     voiceName,
+    pitch: '-20%',
+    rate: '5%',
+    format: 'audio-24khz-48kbitrate-mono-mp3',
   })
 
   if (ttsToken) {
