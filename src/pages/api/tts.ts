@@ -1,6 +1,6 @@
 import type { APIContext } from 'astro'
 import { getEnv } from '../../lib/env'
-import { DEFAULT_TTS_API, DEFAULT_TTS_TOKEN, DEFAULT_TTS_VOICE } from '../../lib/tts'
+import { DEFAULT_TTS_API, DEFAULT_TTS_PITCH, DEFAULT_TTS_RATE, DEFAULT_TTS_TOKEN, DEFAULT_TTS_VOICE } from '../../lib/tts'
 
 export async function GET(context: APIContext): Promise<Response> {
   const { url } = context
@@ -19,8 +19,8 @@ export async function GET(context: APIContext): Promise<Response> {
   const params = new URLSearchParams({
     text,
     voiceName,
-    pitch: '-20%',
-    rate: '5%',
+    pitch: DEFAULT_TTS_PITCH,
+    rate: DEFAULT_TTS_RATE,
     format: 'audio-24khz-48kbitrate-mono-mp3',
   })
 
