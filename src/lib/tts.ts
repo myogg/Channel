@@ -6,7 +6,7 @@ export const DEFAULT_TTS_API = 'https://tts.134688.xyz'
 export const DEFAULT_TTS_TOKEN = ''
 export const DEFAULT_TTS_VOICE = 'zh-CN-XiaoxiaoNeural'
 export const DEFAULT_TTS_PITCH = '-10%'
-export const DEFAULT_TTS_RATE = '-10%'
+export const DEFAULT_TTS_RATE = '-15%'
 
 /** Keeps every synthesis request inside the forwarder's practical text limit. */
 export const TTS_CHUNK_LENGTH = 300
